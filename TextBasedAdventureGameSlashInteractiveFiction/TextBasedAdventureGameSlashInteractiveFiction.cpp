@@ -1,11 +1,14 @@
-// TextBasedAdventureGameSlashInteractiveFiction.cpp : Defines the entry point for the console application.
-//
+#include <string>
+#include <iostream>
 
-#include "stdafx.h"
+using namespace std;
+
+int main() {
+	cout << "Hello, world!";
 
 
-int main()
-{
+	cout << "\n\n";
+	system("pause");
+
     return 0;
 }
-
