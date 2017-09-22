@@ -1,0 +1,4 @@
+﻿  TextBasedAdventureGameSlashInteractiveFiction.cpp
+c:\users\mlowe4\documents\projects\textbasedadventuregameslashinteractivefiction\textbasedadventuregameslashinteractivefiction\textbasedadventuregameslashinteractivefiction.cpp(257): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  TextBasedAdventureGameSlashInteractiveFiction.vcxproj -> C:\Users\mlowe4\Documents\Projects\TextBasedAdventureGameSlashInteractiveFiction\Debug\TextBasedAdventureGameSlashInteractiveFiction.exe
+  TextBasedAdventureGameSlashInteractiveFiction.vcxproj -> C:\Users\mlowe4\Documents\Projects\TextBasedAdventureGameSlashInteractiveFiction\Debug\TextBasedAdventureGameSlashInteractiveFiction.pdb (Partial PDB)
