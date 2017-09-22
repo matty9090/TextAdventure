@@ -1,4 +1,6 @@
 #include <string>
+#include <map>
+#include <ctime>
 #include <vector>
 #include <memory>
 #include <fstream>
@@ -10,6 +12,12 @@ using namespace std;
 
 const string kMapFile = "map.txt";
 const int kMapSize = 10;
+
+struct Item {
+	int hp, damage;
+};
+
+map<string, Item> items;
 
 struct Coord {
 	int x, y;
@@ -32,21 +40,20 @@ class Player : public Living {
 			damage = 10;
 		}
 
-		void setPosition(Coord pos) {
-			position = pos;
+		void outputStats() {
+			cout << "HP = " << hp << ", Damage = " << damage;
 		}
 
-		void move(int x, int y) {
-			position.x += x;
-			position.y += y;
+		void addHP(int n) {
+			hp += n;
 		}
 
-		Coord getPosition() {
-			return position;
+		void addDamage(int n) {
+			damage += n;
 		}
 
 	private:
-		Coord position;
+		
 };
 
 /* Map class */
@@ -72,8 +79,8 @@ class GameMap {
 
 					if ((Tile)tile == Tile::Player)
 						playerPos.x = x, playerPos.y = y;
-					
-					map[y][x] = (Tile)tile;
+					else
+						map[y][x] = (Tile)tile;
 				}
 			}
 
@@ -81,6 +88,20 @@ class GameMap {
 		}
 
 		void display() {
+			for (int y = 0; y < kMapSize; y++) {
+				for (int x = 0; x < kMapSize; x++) {
+					if (x == playerPos.x && y == playerPos.y)
+						cout << "P ";
+					else
+						cout << (((int)map[y][x] > 2) ? 0 : (int)map[y][x]) << " ";
+				}
+
+				cout << endl;
+			}
+		}
+
+		// For debugging
+		void output() {
 			for (int y = 0; y < kMapSize; y++) {
 				for (int x = 0; x < kMapSize; x++)
 					cout << (int)map[y][x] << " ";
@@ -91,6 +112,14 @@ class GameMap {
 
 		Coord getPlayerPosition() {
 			return playerPos;
+		}
+
+		void updatePlayerPosition(Coord pos) {
+			playerPos = pos;
+		}
+
+		Tile getTile(Coord pos) {
+			return map[pos.x][pos.y];
 		}
 
 	private:
@@ -108,18 +137,18 @@ Coord moveDirection() {
 		cout << "Where do you want to go?\n\n";
 		cout << "1 = Left\n";
 		cout << "2 = Forward\n";
-		cout << "3 = Right\n";
+		cout << "3 = Right\n\n";
 
 		int dir;
 		cin >> dir;
 
 		switch (dir) {
-		case 1: pos.x--; break;
-		case 2: pos.y++; break;
-		case 3: pos.x++; break;
+			case 1: pos.x--; break;
+			case 2: pos.y--; break;
+			case 3: pos.x++; break;
 
-		default:
-			error = true;
+			default:
+				error = true;
 		}
 
 		if (!error)
@@ -129,29 +158,64 @@ Coord moveDirection() {
 	return pos;
 }
 
+void pickupItem(shared_ptr<Player> player) {
+	int prob = rand() % 10;
+	Item item;
+
+	if (prob < 5)
+		item = items["Sword"];
+	else if (prob < 9)
+		item = items["Chainmail"];
+	else
+		item = items["Dildo"];
+}
+
+void checkTile(shared_ptr<Player> player, GameMap::Tile tile) {
+	switch(tile) {
+		case GameMap::Tile::Item: pickupItem(player); break;
+	}
+}
+
+void initItems();
+
 int main() {
+	srand(time(0));
+
 	cout << "Welcome to TextAdventureInteractiveFiction!!!\n\n";
 
-	GameMap gameMap(kMapFile);
-	gameMap.display();
+	initItems();
 
-	Player player;
-	player.setPosition(gameMap.getPlayerPosition());
+	GameMap gameMap(kMapFile);
+	shared_ptr<Player> player = make_shared<Player>();
 
 	while (true) {
+		player->outputStats();
+		cout << "\n\n";
+
+		gameMap.display();
+		cout << endl;
+
 		Coord nPos = moveDirection();
-		Coord playerPos = player.getPosition();
+		Coord playerPos = gameMap.getPlayerPosition();
 
 		nPos.x += playerPos.x;
 		nPos.y += playerPos.y;
 
-		player.setPosition(nPos);
+		gameMap.updatePlayerPosition(nPos);
 
-		cout << "x: " << nPos.x << " y: " << nPos.y << endl;
+		checkTile(player, gameMap.getTile(nPos));
+
+		system("cls");
 	}
 	
 	cout << "\n\n";
 	system("pause");
 
     return 0;
+}
+
+void initItems() {
+	items["Sword"] = { 0, 10 };
+	items["Chainmail"] = { 50, 0 };
+	items["Dildo"] = { 0, 100 };
 }
